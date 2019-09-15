@@ -1,0 +1,21 @@
+{
+  "name": "tsc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": " tsc -b server client -w",
+    "start": "node server/dist/start.js",
+    "onlystart": "npm run compile && node server/dist/start.js",
+    "clean": "node utils/clean.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.7.4",
+    "@types/opn": "^5.5.0",
+    "opn": "^6.0.0",
+    "typescript": "^3.5.3"
+  }
+}
