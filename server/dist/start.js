@@ -21,7 +21,7 @@ const RootMiddleware_1 = __importDefault(require("./middlewares/RootMiddleware")
     const browser = yield OpenBrowser();
 }))();
 function OpenBrowser() {
-    return opn_1.default('http://localhost:3000/email/lo');
+    return opn_1.default('http://localhost:3000/wiki/index.html');
 }
 /*http.get({
     host: 'localhost',
