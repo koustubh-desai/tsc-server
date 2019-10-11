@@ -1,10 +1,12 @@
 import fs from 'fs';
 import http from 'http';
 import opn from 'opn'; 
-import app from './express/app';
-import middleware from './middlewares/RootMiddleware';
-import sendFile from './sendfile';
-// NICE REFERENCE https://stackoverflow.com/questions/6968448/where-is-body-in-a-nodejs-http-get-response
+import app from './express/Express';
+import middleware from './RootMiddleware';
+import { Http2ServerRequest, Http2ServerResponse } from 'http2';
+
+
+const OpenBrowser=()=>opn('http://localhost:3000/index.html');
 
 (async ()=>{
     const middle = await middleware();
@@ -12,50 +14,4 @@ import sendFile from './sendfile';
     const browser = await OpenBrowser();
 })();
 
-function OpenBrowser(){
-    return opn('http://localhost:3000/index.html');
-}
-/*http.get({
-    host: 'localhost',
-    port:3000,
-    protocol:'http:',
-    path: ''
-}, (resp)=>{
-    console.log('GROOT');
-});
-http.get({
-    host: 'localhost',
-    port:3000,
-    protocol:'http:',
-    search: 'lo'
-}, (resp)=>{
-    console.log('LELO');
-});
-
-http.get({
-    host: 'localhost',
-    port:3000,
-    protocol:'http:',
-    search:'email'
-}, (resp)=>{
-    console.log('EMAIs');
-});*/
-// (async ()=>{
-//     const brow = await opn('');
-//     console.log('heyosa',brow);
-// })()
-
-
-/*const server = http.createServer();
-server.on('request',async (req,res)=>{
-    const browser = await openBrowser();
-    console.log('heyo',browser);
-})
-
-function openBrowser(){
-    return new Promise(resolve=>{
-        setTimeout(()=>{
-            resolve(opn.new());
-        },0)
-    })
-}*/
+// NICE REFERENCE https://stackoverflow.com/questions/6968448/where-is-body-in-a-nodejs-http-get-response
