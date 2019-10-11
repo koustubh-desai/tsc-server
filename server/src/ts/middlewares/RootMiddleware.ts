@@ -13,12 +13,12 @@ const init=()=>{
             console.log("In jojo");
             next();
         });
-        app.use((req:Http2ServerRequest,resp,next)=>{
+        app.use((req:Http2ServerRequest,resp:Http2ServerResponse,next)=>{
             // do whatever...
             console.log("In koko");
             next();
         });
-        app.static("//path_to_html_css_js");
+        app.static("/stm");
         resolve('donesa');
     })
 }

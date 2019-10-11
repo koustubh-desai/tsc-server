@@ -1,12 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -15,13 +7,13 @@ const opn_1 = __importDefault(require("opn"));
 const app_1 = __importDefault(require("./express/app"));
 const RootMiddleware_1 = __importDefault(require("./middlewares/RootMiddleware"));
 // NICE REFERENCE https://stackoverflow.com/questions/6968448/where-is-body-in-a-nodejs-http-get-response
-(() => __awaiter(this, void 0, void 0, function* () {
-    const middle = yield RootMiddleware_1.default();
-    const server = yield app_1.default.listen(3000);
-    const browser = yield OpenBrowser();
-}))();
+(async () => {
+    const middle = await RootMiddleware_1.default();
+    const server = await app_1.default.listen(3000);
+    const browser = await OpenBrowser();
+})();
 function OpenBrowser() {
-    return opn_1.default('http://localhost:3000/wiki/index.html');
+    return opn_1.default('http://localhost:3000/index.html');
 }
 /*http.get({
     host: 'localhost',

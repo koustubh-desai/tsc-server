@@ -4,13 +4,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = __importDefault(require("http"));
-const AssetLoader_1 = __importDefault(require("./AssetLoader"));
+const AssetLoader_1 = require("./AssetLoader");
 class RealApp {
     constructor() {
-        //this.arr=[];
-        this.addMiddleware = (fn) => { RealApp.arr.push(fn); };
+        this.pathForAssets = [];
+        this.arr = [];
+        this.serveFileMiddleware = (req, resp, next) => {
+            AssetLoader_1.loadAsset(req, resp, this.pathForAssets);
+            next();
+        };
+        this.addMiddleware = (fn) => { this.arr.push(fn); };
         this.iterateMiddlewares = (req, resp) => {
-            const iter = RealApp.arr[Symbol.iterator]();
+            const iter = [...this.arr, this.serveFileMiddleware][Symbol.iterator]();
             //dropper(iter)(req,resp,dropper(iter));
             const goAlong = () => {
                 let c = iter.next();
@@ -21,23 +26,9 @@ class RealApp {
             goAlong();
         };
     }
-    addAssetPath(str) {
-        if (!RealApp.pathForAssets.find((p) => p == str)) {
-            RealApp.pathForAssets.push(str);
-        }
-    }
+    addAssetPath(str) { if (!this.pathForAssets.find((p) => p == str))
+        this.pathForAssets.push(str); }
 }
-RealApp.pathForAssets = [];
-RealApp.serveFileMiddleware = (req, resp, next) => {
-    let assetName = req.url.match(/[A-Za-z1-9]*\.(html|css|js|json|jpeg|jpg|png|css|ico)/i);
-    assetName = (assetName && assetName.length) ? assetName[0] : null;
-    if (assetName) {
-        let a = new AssetLoader_1.default();
-        RealApp.pathForAssets.find(dir => a.load(resp, dir + '/' + assetName));
-    }
-    next();
-};
-RealApp.arr = [RealApp.serveFileMiddleware];
 const app = (() => {
     const funcs = [];
     const realapp = new RealApp();
@@ -51,8 +42,9 @@ const app = (() => {
         listen: (port) => {
             return new Promise(resolve => {
                 server = http_1.default.createServer((req, resp) => {
-                    console.log("Wallahs req");
+                    console.log('BEGIN');
                     realapp.iterateMiddlewares(req, resp);
+                    console.log("END");
                 }).listen(port);
                 resolve(server);
             });

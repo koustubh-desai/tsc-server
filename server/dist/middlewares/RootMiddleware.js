@@ -17,7 +17,7 @@ const init = () => {
             console.log("In koko");
             next();
         });
-        app_1.default.static("//path_to_html_css_js");
+        app_1.default.static("/stm");
         resolve('donesa');
     });
 };

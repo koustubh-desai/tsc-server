@@ -3,7 +3,8 @@
     "compilerOptions": {
         "outDir": "./dist",                        /* Redirect output structure to the directory. */
         "rootDir": "./src/ts",
-        "noImplicitAny": false
+        "noImplicitAny": false,
+        "target": "es2020"
     }
   }
   

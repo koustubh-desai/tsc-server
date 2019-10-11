@@ -13,7 +13,7 @@ import sendFile from './sendfile';
 })();
 
 function OpenBrowser(){
-    return opn('http://localhost:3000/wiki/index.html');
+    return opn('http://localhost:3000/index.html');
 }
 /*http.get({
     host: 'localhost',
