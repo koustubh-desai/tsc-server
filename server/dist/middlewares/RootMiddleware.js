@@ -18,6 +18,7 @@ const init = () => {
             next();
         });
         app_1.default.static("/stm");
+        app_1.default.static("/dist");
         resolve('donesa');
     });
 };

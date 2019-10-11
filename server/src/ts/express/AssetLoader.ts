@@ -2,11 +2,12 @@ import { Http2ServerResponse, Http2ServerRequest } from "http2";
 import { exists, existsSync, readFile, readFileSync } from "fs";
 const path = require('path');
 
-const AppFolderName =process.cwd()+"/client";
+const AppFolderName =process.cwd()+'/client';
 
 const encoding = {
     html:'utf-8',
-    png:''
+    png:'',
+    js:'utf-8'
 }
 
 /*
@@ -14,22 +15,30 @@ const encoding = {
 */
 const mimetype = {
     html:'text/html',
-    js:'application/javascript',
+    js:'text/javascript',
     png:'image/png'
 }
 
 export const loadAsset = (req:Http2ServerRequest,resp:Http2ServerResponse,folders:String[]) =>{
-    
+    console.log(" Req= ",req.url, "  and folderes are ",folders);
     let type = req.url.match(/(html|css|js|json|jpeg|jpg|png|css|ico)$/gi);
-    let foundAt = type?folders.find(dir=>existsSync(path.resolve(path.join(AppFolderName,dir,req.url)))):'';
+    let foundAt = type?folders.find(dir=>{
+        console.log("JAJA",dir,existsSync(path.resolve(path.join(AppFolderName,dir,req.url))));
+        return existsSync(path.resolve(path.join(AppFolderName,dir,req.url)));
+    }):'';
     let filepath = foundAt?path.resolve(path.join(AppFolderName,foundAt,req.url)):null;
+    console.log(" calculated path is ",foundAt, filepath,type);
     if(filepath && type){
+        console.log("loading.... ",req.url);
         resp.setHeader("Content-Type", mimetype[type[0]]);
         readFile(filepath,encoding[type[0]],(err,data)=>{
             if(!err)resp.write(data,writeErr=>writeErr?console.log("From AssetLoader.ts:"+writeErr):'');
             resp.end();
         })
         
+    }
+    else{
+        resp.end();
     }
     // Check if req is for asset
     //let asset = req.url.match(/[A-Za-z1-9_-]*\.(html|css|js|json|jpeg|jpg|png|css|ico)$/i)?

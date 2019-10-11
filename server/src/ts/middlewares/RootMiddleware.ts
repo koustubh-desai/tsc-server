@@ -19,6 +19,7 @@ const init=()=>{
             next();
         });
         app.static("/stm");
+        app.static("/dist");
         resolve('donesa');
     })
 }
