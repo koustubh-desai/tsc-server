@@ -2,6 +2,8 @@ import http from 'http';
 import { Http2ServerResponse, Http2ServerRequest } from 'http2';
 import { loadAsset } from './AssetLoader';
 import {GetEndPoints} from '../interfaces';
+import { isAsset, functionForGetEndpoints } from './Utils';
+import { runInNewContext } from 'vm';
 
 
 class RealApp{
@@ -18,8 +20,12 @@ class RealApp{
     addMiddleware=(fn:Function)=>{this.middlewares.push(fn);}
     addGetRoutes=(endpoint:GetEndPoints)=>this.getRoutes.push(endpoint);
     iterateMiddlewares=(req,resp)=>{
-        const iter = [...this.middlewares,this.serveFileMiddleware][Symbol.iterator]();
-        const goAlong=()=>{
+        const iter = ((req)=>{
+            if(isAsset(req.url)) return [...this.middlewares,this.serveFileMiddleware][Symbol.iterator]();
+            else if(req.method == 'GET') return [...this.middlewares,...functionForGetEndpoints(req,this.getRoutes)][Symbol.iterator]();
+            return this.middlewares[Symbol.iterator]();            
+        })(req);
+          const goAlong=()=>{
             let nextMiddleware = iter.next();
             if(!nextMiddleware.done){
                 nextMiddleware.value(req,resp,goAlong);
@@ -34,7 +40,10 @@ const app = (()=>{
     const realapp = new RealApp();
     let server;
     return {
-        get:(url:String|RegExp, fn:Function)=>realapp.addGetRoutes(<GetEndPoints>{endpoint:url,fn}),
+        get:(url:String|RegExp, fn:Function)=>
+            (fn.length == 3)?
+            realapp.addGetRoutes(<GetEndPoints>{endpoint:url,fn})
+            :realapp.addGetRoutes(<GetEndPoints>{endpoint:url,fn:(req,res,next)=>{fn(req,res);next();}}),
         post:()=>{},
         delete:()=>{},
         update:()=>{},

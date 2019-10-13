@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = __importDefault(require("http"));
 const AssetLoader_1 = require("./AssetLoader");
+const Utils_1 = require("./Utils");
 class RealApp {
     constructor() {
         this.pathForAssets = [];
@@ -17,7 +18,13 @@ class RealApp {
         this.addMiddleware = (fn) => { this.middlewares.push(fn); };
         this.addGetRoutes = (endpoint) => this.getRoutes.push(endpoint);
         this.iterateMiddlewares = (req, resp) => {
-            const iter = [...this.middlewares, this.serveFileMiddleware][Symbol.iterator]();
+            const iter = ((req) => {
+                if (Utils_1.isAsset(req.url))
+                    return [...this.middlewares, this.serveFileMiddleware][Symbol.iterator]();
+                else if (req.method == 'GET')
+                    return [...this.middlewares, ...Utils_1.functionForGetEndpoints(req, this.getRoutes)][Symbol.iterator]();
+                return this.middlewares[Symbol.iterator]();
+            })(req);
             const goAlong = () => {
                 let nextMiddleware = iter.next();
                 if (!nextMiddleware.done) {
@@ -35,7 +42,9 @@ const app = (() => {
     const realapp = new RealApp();
     let server;
     return {
-        get: (url, fn) => realapp.addGetRoutes({ endpoint: url, fn }),
+        get: (url, fn) => (fn.length == 3) ?
+            realapp.addGetRoutes({ endpoint: url, fn })
+            : realapp.addGetRoutes({ endpoint: url, fn: (req, res, next) => { fn(req, res); next(); } }),
         post: () => { },
         delete: () => { },
         update: () => { },
