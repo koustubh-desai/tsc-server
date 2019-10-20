@@ -2,8 +2,9 @@ import http from 'http';
 import { Http2ServerResponse, Http2ServerRequest } from 'http2';
 import { loadAsset } from './AssetLoader';
 import {GetEndPoints} from '../interfaces';
-import { isAsset, functionForGetEndpoints } from './Utils';
+import { isAsset, endpointFunctionsArray, createRegExForUrl, functionWithNextHandler, extractParamsFromUrl } from './Utils';
 import { runInNewContext } from 'vm';
+import { start } from 'repl';
 
 
 class RealApp{
@@ -22,7 +23,7 @@ class RealApp{
     iterateMiddlewares=(req,resp)=>{
         const iter = ((req)=>{
             if(isAsset(req.url)) return [...this.middlewares,this.serveFileMiddleware][Symbol.iterator]();
-            else if(req.method == 'GET') return [...this.middlewares,...functionForGetEndpoints(req,this.getRoutes)][Symbol.iterator]();
+            else if(req.method == 'GET') return [...this.middlewares,...endpointFunctionsArray(req,this.getRoutes)][Symbol.iterator]();
             return this.middlewares[Symbol.iterator]();            
         })(req);
           const goAlong=()=>{
@@ -40,10 +41,15 @@ const app = (()=>{
     const realapp = new RealApp();
     let server;
     return {
-        get:(url:String|RegExp, fn:Function)=>
-            (fn.length == 3)?
+        get:(url:String|RegExp, fn:Function)=>{
+            const theCondition = (typeof(url)==='string')?url:{};
+            fn = functionWithNextHandler(fn);
+            if(url.toString().match(/:/)){
+                url = createRegExForUrl(url.toString());
+                fn = extractParamsFromUrl(fn,theCondition);
+            }
             realapp.addGetRoutes(<GetEndPoints>{endpoint:url,fn})
-            :realapp.addGetRoutes(<GetEndPoints>{endpoint:url,fn:(req,res,next)=>{fn(req,res);next();}}),
+        },
         post:()=>{},
         delete:()=>{},
         update:()=>{},
@@ -54,9 +60,12 @@ const app = (()=>{
                 resolve(server);
             })
         },
-        use:(fn:Function )=>realapp.addMiddleware(fn),
+        use:(fn:Function )=>realapp.addMiddleware(functionWithNextHandler(fn)),
         static:(path:String)=>realapp.addAssetPath(path)
     }
 })();
 
 export default app;
+
+
+

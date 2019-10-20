@@ -22,7 +22,7 @@ class RealApp {
                 if (Utils_1.isAsset(req.url))
                     return [...this.middlewares, this.serveFileMiddleware][Symbol.iterator]();
                 else if (req.method == 'GET')
-                    return [...this.middlewares, ...Utils_1.functionForGetEndpoints(req, this.getRoutes)][Symbol.iterator]();
+                    return [...this.middlewares, ...Utils_1.endpointFunctionsArray(req, this.getRoutes)][Symbol.iterator]();
                 return this.middlewares[Symbol.iterator]();
             })(req);
             const goAlong = () => {
@@ -42,9 +42,15 @@ const app = (() => {
     const realapp = new RealApp();
     let server;
     return {
-        get: (url, fn) => (fn.length == 3) ?
-            realapp.addGetRoutes({ endpoint: url, fn })
-            : realapp.addGetRoutes({ endpoint: url, fn: (req, res, next) => { fn(req, res); next(); } }),
+        get: (url, fn) => {
+            const theCondition = (typeof (url) === 'string') ? url : {};
+            fn = Utils_1.functionWithNextHandler(fn);
+            if (url.toString().match(/:/)) {
+                url = Utils_1.createRegExForUrl(url.toString());
+                fn = Utils_1.extractParamsFromUrl(fn, theCondition);
+            }
+            realapp.addGetRoutes({ endpoint: url, fn });
+        },
         post: () => { },
         delete: () => { },
         update: () => { },
@@ -55,7 +61,7 @@ const app = (() => {
                 resolve(server);
             });
         },
-        use: (fn) => realapp.addMiddleware(fn),
+        use: (fn) => realapp.addMiddleware(Utils_1.functionWithNextHandler(fn)),
         static: (path) => realapp.addAssetPath(path)
     };
 })();

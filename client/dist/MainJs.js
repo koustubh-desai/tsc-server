@@ -5,7 +5,7 @@
         switch(e.target.id){
             case 'jojo':
                 $.ajax({
-                    url:'/json',
+                    url:'/json/1/nana/Jim',
                     method:'GET',
                     data:{kaka:'mama',lala:'baba'},
                     success:function(e){console.log("WOKKAY",e)}
@@ -15,7 +15,7 @@
             
         }
     })
-    doc.ready(function(e){
+    $(document).ready(function(e){
         $('#main').append(btn);
     })
-})(window,jQuery)
+})(window,jQuery);
