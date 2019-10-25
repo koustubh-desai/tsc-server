@@ -5,16 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Express_1 = __importDefault(require("./express/Express"));
 const AssetLoader_1 = require("./express/AssetLoader");
-const jsons_1 = require("./db/jsons");
 const url = require('url');
 const init = () => {
     return new Promise(resolve => {
         // all middlewares here
         Express_1.default.use((req, resp, next) => {
-            console.log("Defininng CORS");
-            resp.setHeader('Access-Control-Allow-Origin', '*');
-            resp.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-            resp.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+            console.log("Middle ware KOO");
             next();
         });
         Express_1.default.use((req, resp) => {
@@ -32,12 +28,6 @@ const init = () => {
             let pathname = Url.pathname; //req.url.replace(/((\/\w*)*)(\?)?(((\w*=\w*)(&)?)*)/,'$1');
             let params = Url.query;
             console.log("GET For /json/:id/nana/:name", params, extractedObj);
-            res.end();
-        });
-        Express_1.default.get('/todo', (req, res, next) => {
-            console.log(" fetch todo list");
-            res.setHeader("Content-Type", AssetLoader_1.mimetype['json']); //res.write(JSON.stringify(obj),err=>{console.log("Effor ",err)});
-            res.write(JSON.stringify(jsons_1.todo));
             res.end();
         });
         Express_1.default.static("/stm");

@@ -20,8 +20,9 @@ class RealApp{
     addAssetPath(str:String){if(!this.pathForAssets.find((p)=>p==str)) this.pathForAssets.push(str);}
     addMiddleware=(fn:Function)=>{this.middlewares.push(fn);}
     addGetRoutes=(endpoint:GetEndPoints)=>this.getRoutes.push(endpoint);
+    
     iterateMiddlewares=(req,resp)=>{
-        const iter = ((req)=>{
+        const iter = ((req)=>{       
             if(isAsset(req.url)) return [...this.middlewares,this.serveFileMiddleware][Symbol.iterator]();
             else if(req.method == 'GET') return [...this.middlewares,...endpointFunctionsArray(req,this.getRoutes)][Symbol.iterator]();
             return this.middlewares[Symbol.iterator]();            

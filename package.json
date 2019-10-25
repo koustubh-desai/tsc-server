@@ -6,7 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": " tsc -b server client -w",
+    "start2": "cd MySqlProject && npm run start && cd .. && node server/dist/start.js",
     "start": "node server/dist/start.js",
+    "startts": "ts-node server/src/ts/start.ts",
+    "db": "node server/dist/db/Db.js",
     "onlystart": "npm run compile && node server/dist/start.js",
     "clean": "node utils/clean.js"
   },
@@ -15,7 +18,12 @@
   "devDependencies": {
     "@types/node": "^12.7.4",
     "@types/opn": "^5.5.0",
+    "mysql": "^2.17.1",
     "opn": "^6.0.0",
+    "reflect-metadata": "^0.1.13",
+    "ts-node": "^8.4.1",
+    "typeorm": "^0.2.20",
     "typescript": "^3.5.3"
-  }
+  },
+  "dependencies": {}
 }
